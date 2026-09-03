@@ -132,17 +132,11 @@ Returns `{"status":"UP"}` and is suitable for Kubernetes/GKE probes later.
 
 ## GitHub Actions
 
-CI is defined in `.github/workflows/backend-ci.yml` but is **currently
-disabled**: the workflow file is entirely commented out, so pushing to GitHub
-does not trigger any build.
-
-When enabled, it sets up JDK 17, runs `mvn test` (including the Testcontainers
-integration test, using the Docker preinstalled on the runner) and then
-`mvn package`, and fails the build if tests fail. It is configured to run on the
-`main` branch and on pull requests.
-
-To enable it, open the workflow file and uncomment the block (remove the leading
-`# ` from each line).
+CI is defined in `.github/workflows/backend-ci.yml`. It runs on pushes to the
+`main` branch and on pull requests targeting `main`: it sets up JDK 17, runs
+`mvn test` (including the Testcontainers integration test, using the Docker
+preinstalled on the runner) and then `mvn package`. The build fails if tests
+fail.
 
 ## Local Maven note
 
