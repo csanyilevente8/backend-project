@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Local Maven settings for building this learning project against Maven Central.
+
+  Why this file exists:
+  The machine's global ~/.m2/settings.xml is configured for a corporate
+  (Ericsson) Artifactory that mirrors "central" and requires VPN/credentials.
+  That configuration blocks public artifact downloads for this standalone
+  project. This file overrides those settings for local builds only and does
+  NOT touch the global configuration.
+
+  Usage:
+    mvn -s .mvn/settings.xml <goals>
+
+  The CI environment uses the default Maven Central and does not need this file.
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <localRepository>${user.home}/.m2/todo-repository</localRepository>
+
+    <profiles>
+        <profile>
+            <id>central-only</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>central-only</activeProfile>
+    </activeProfiles>
+
+</settings>
