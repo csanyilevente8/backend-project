@@ -149,3 +149,5 @@ mvn -s .mvn/settings.xml test
 ```
 
 CI uses the default Maven Central and does not need this file.
+
+this line will trigger the pipeline
