@@ -50,15 +50,21 @@ docker compose up -d
 | `DB_PORT`               | `5432`                  | PostgreSQL port                   |
 | `DB_NAME`               | `todo`                  | Database name                     |
 | `DB_USERNAME`           | `todo`                  | Database user                     |
-| `DB_PASSWORD`           | `todo`                  | Database password                 |
+| `DB_PASSWORD`           | **(required, no default)** | Database password. The app fails to start if this is unset. |
 | `CORS_ALLOWED_ORIGINS`  | `http://localhost:4200` | Comma-separated allowed origins   |
 
-No secrets are committed. For production, supply these through GitHub Secrets,
-Google Cloud Secret Manager or Kubernetes Secrets.
+No secrets are committed. `DB_PASSWORD` has no built-in default on purpose, so a
+misconfigured deploy fails loudly instead of running with a guessable fallback.
+For production, supply these through GitHub Secrets, Google Cloud Secret Manager
+or Kubernetes Secrets.
 
 ## Run the backend
 
+`DB_PASSWORD` must be provided. With the local PostgreSQL from `docker compose`
+(which defaults to password `todo`):
+
 ```bash
+export DB_PASSWORD=todo
 mvn spring-boot:run
 ```
 

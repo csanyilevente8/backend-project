@@ -6,7 +6,10 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:todo}
     username: ${DB_USERNAME:todo}
-    password: ${DB_PASSWORD:todo}
+    # No default: the app must be given DB_PASSWORD (from the Kubernetes Secret
+    # in the cluster, or the environment locally). Without it Spring fails to
+    # start rather than silently using a guessable fallback password.
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
