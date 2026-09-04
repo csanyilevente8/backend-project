@@ -1,0 +1,10 @@
+# Ignore everything not needed in the Docker build context.
+target/
+.git/
+.github/
+.mvn/
+*.iml
+.idea/
+.vscode/
+.settings/
+README.md
