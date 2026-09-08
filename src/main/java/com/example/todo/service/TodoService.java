@@ -4,11 +4,14 @@ import com.example.todo.dto.CreateTodoRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.dto.UpdateTodoRequest;
 import com.example.todo.entity.Todo;
+import com.example.todo.events.TodoEvent;
+import com.example.todo.events.TodoEventPublisher;
 import com.example.todo.exception.TodoNotFoundException;
 import com.example.todo.repository.TodoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,15 +26,23 @@ import java.util.UUID;
 public class TodoService {
 
     private final TodoRepository todoRepository;
+    private final TodoEventPublisher eventPublisher;
 
-    public TodoService(TodoRepository todoRepository) {
+    public TodoService(TodoRepository todoRepository, TodoEventPublisher eventPublisher) {
         this.todoRepository = todoRepository;
+        this.eventPublisher = eventPublisher;
+    }
+
+    private void emit(String type, TodoResponse t) {
+        eventPublisher.publish(new TodoEvent(type, t.id(), t.title(), t.completed(), Instant.now()));
     }
 
     public TodoResponse create(CreateTodoRequest request) {
         Todo todo = new Todo(request.title(), request.description());
         Todo saved = todoRepository.save(todo);
-        return TodoResponse.from(saved);
+        TodoResponse resp = TodoResponse.from(saved);
+        emit(TodoEvent.TYPE_CREATED, resp);
+        return resp;
     }
 
     @Transactional(readOnly = true)
@@ -53,18 +64,24 @@ public class TodoService {
         todo.setDescription(request.description());
         todo.setCompleted(request.completed());
         // Managed entity is flushed on transaction commit; return current state.
-        return TodoResponse.from(todo);
+        TodoResponse resp = TodoResponse.from(todo);
+        emit(TodoEvent.TYPE_UPDATED, resp);
+        return resp;
     }
 
     public TodoResponse updateCompletion(UUID id, boolean completed) {
         Todo todo = getExisting(id);
         todo.setCompleted(completed);
-        return TodoResponse.from(todo);
+        TodoResponse resp = TodoResponse.from(todo);
+        emit(TodoEvent.TYPE_COMPLETED, resp);
+        return resp;
     }
 
     public void delete(UUID id) {
         Todo todo = getExisting(id);
+        TodoResponse resp = TodoResponse.from(todo);
         todoRepository.delete(todo);
+        emit(TodoEvent.TYPE_DELETED, resp);
     }
 
     private Todo getExisting(UUID id) {

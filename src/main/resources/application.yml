@@ -21,11 +21,33 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: false
+  # Kafka is optional. When KAFKA_BROKERS is set, the producer publishes events
+  # and the consumer (activity-logger) runs; when unset, bootstrap-servers is
+  # empty, the consumer is disabled (@ConditionalOnProperty) and the publisher
+  # is a no-op, so the app runs unchanged without Kafka.
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: activity-logger
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: com.example.todo.events.TodoEvent
+        spring.json.trusted.packages: "com.example.todo.events"
+        spring.json.use.type.headers: false
 
 # Allowed CORS origins for the frontend. Override for production.
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+  kafka:
+    # Turn on the Kafka consumer (activity-logger). Set true in the cluster
+    # together with KAFKA_BROKERS. Default false so tests/local run without Kafka.
+    enabled: ${APP_KAFKA_ENABLED:false}
 
 management:
   endpoints:
