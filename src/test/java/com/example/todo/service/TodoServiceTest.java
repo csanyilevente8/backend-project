@@ -30,6 +30,9 @@ class TodoServiceTest {
     @Mock
     private TodoRepository todoRepository;
 
+    @Mock
+    private com.example.todo.events.TodoEventPublisher eventPublisher;
+
     @InjectMocks
     private TodoService todoService;
 
